@@ -1,5 +1,5 @@
 import { collection, getDocs, addDoc, updateDoc, doc, query, orderBy } from "firebase/firestore";
-import { db } from "../../firebase.js"; // adjust path if needed
+import { db } from "../firebase.js"; // adjust path if needed
 
 // Fetch all responses, sorted by upvotes
 export const fetchAllResponses = async () => {
