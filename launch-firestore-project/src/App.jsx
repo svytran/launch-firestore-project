@@ -1,35 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import React, { useEffect, useState } from "react";
+import { fetchAllResponses, addResponse, upvoteResponse } from "./utils/responses";
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [responses, setResponses] = useState([]);
+  const [input, setInput] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setResponses(await fetchAllResponses());
+    };
+    fetchData();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    await addResponse(input);
+    setInput("");
+    setResponses(await fetchAllResponses());
+  };
+
+  const handleUpvote = async (id, upvotes) => {
+    await upvoteResponse(id, upvotes);
+    setResponses(await fetchAllResponses());
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      <h1>What's the best pizza topping?</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          placeholder="Your answer"
+        />
+        <button type="submit">Submit</button>
+      </form>
+      <ul>
+        {responses.map(r => (
+          <li key={r.id}>
+            {r.text} — {r.upvotes} upvotes
+            <button onClick={() => handleUpvote(r.id, r.upvotes)}>Upvote</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
-
-export default App
